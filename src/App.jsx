@@ -1,28 +1,65 @@
-import { useState } from 'react'
+import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Header from './components/Header';
+import Sidebar from './components/Sidebar';
+import PostComposer from './components/PostComposer';
+import Feed from './components/Feed';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [showComposerHint, setShowComposerHint] = React.useState(false);
+
+  const handleNewPost = () => {
+    setShowComposerHint(true);
+    setTimeout(() => setShowComposerHint(false), 1500);
+  };
+
+  const handleSubmitPost = (data) => {
+    // В реальном приложении здесь будет запрос к API
+    alert(`Черновик отправлен (демо):\n\nЗаголовок: ${data.title}\nТекст: ${data.body.substring(0, 120)}…`);
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Vibe Coding Platform
-        </h1>
-        <p className="text-gray-600 mb-6">
-          Your AI-powered development environment
-        </p>
-        <div className="text-center">
-          <button
-            onClick={() => setCount(count + 1)}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-          >
-            Count is {count}
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
+    <div className="min-h-screen bg-[#FBFCFE] text-gray-900">
+      <Header onSearchFocus={() => {}} />
 
-export default App
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[18rem_1fr]">
+          <Sidebar onNewPost={handleNewPost} />
+
+          <div className="space-y-6">
+            <div className="relative">
+              <AnimatePresence>
+                {showComposerHint && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute -top-5 left-2 z-10 rounded-md bg-[#1F6FEB] px-2 py-1 text-xs text-white shadow"
+                  >
+                    Откройте редактор ниже
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              <PostComposer onSubmit={handleSubmitPost} />
+            </div>
+
+            <section>
+              <div className="mb-3 flex items-end justify-between">
+                <h2 className="text-xl font-semibold">Лента</h2>
+                <div className="text-sm text-gray-500">Сортировка: актуальные</div>
+              </div>
+              <Feed />
+            </section>
+          </div>
+        </div>
+      </main>
+
+      <footer className="mx-auto max-w-7xl px-4 pb-10 pt-2 text-sm text-gray-500 sm:px-6 lg:px-8">
+        <p>
+          Сделано как демо-интерфейс. Полный функционал (регистрация, публикация, комментарии, модерация, поиск, уведомления) будет добавлен при подключении сервера и базы данных.
+        </p>
+      </footer>
+    </div>
+  );
+}
